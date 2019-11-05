@@ -21,11 +21,12 @@ class PastesController < ApplicationController
 
   default_search_scope :pastes
 
-  before_filter :find_paste_and_project, :authorize
+  before_action :find_paste_and_project, :authorize
 
   accept_rss_auth :index
 
   def index
+    params.permit!
     @limit = per_page_option
 
     @pastes_count = @pastes.count
@@ -45,6 +46,7 @@ class PastesController < ApplicationController
   end
 
   def download
+    params.permit!
     send_data @paste.text, :filename => pastebin_filename(@paste),
       :type => pastebin_mime_type(@paste),
       :disposition => 'attachment'
@@ -58,6 +60,7 @@ class PastesController < ApplicationController
   end
 
   def create
+    params.permit!
     @paste = @project.pastes.build(params[:paste])
     @paste.author = User.current
     @paste.secure = (params[:paste][:secure] == "1")
@@ -71,6 +74,7 @@ class PastesController < ApplicationController
   end
 
   def update
+    params.permit!
     if params[:fork].present?
       create
     else
@@ -84,6 +88,7 @@ class PastesController < ApplicationController
   end
 
   def destroy
+    params.permit!
     @paste.destroy
     flash[:notice] = l(:notice_paste_destroyed)
     redirect_to :action => "index", :project_id => params[:project_id]
@@ -92,6 +97,7 @@ class PastesController < ApplicationController
   private
 
   def find_paste_and_project
+    params.permit!
     @project = Project.find(params[:project_id]) if params[:project_id].present?
     @pastes = Paste.visible(User.current, :project => @project)
 

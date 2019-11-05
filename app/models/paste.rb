@@ -19,8 +19,6 @@
 require "digest/sha1"
 
 class Paste < ActiveRecord::Base
-  attr_accessible :title, :lang, :text
-
   belongs_to :project
   belongs_to :author, :class_name => 'User'
 
